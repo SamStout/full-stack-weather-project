@@ -7,7 +7,40 @@ function App() {
   
 
 
-  const getWeather = (input)=>{
+  const weatherToApi = (weather) => {
+      console.log(weather)
+     return {
+    'name' : `${weather.name}`,
+    'clouds':`${weather.clouds.all}`,
+    'description' : weather.weather[0].description
+}}
+
+  // const postWeather = (weather) =>{
+  //   fetch (`http://localhost:3010/`)
+  //   .then((res)=>{
+  //     return res.json()
+  //   })
+  //   .then((postData)=>{
+
+  //   })
+  // }
+
+  const addWeatherToApi = (forecast) =>{
+    fetch("http://localhost:3010/", {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(weatherToApi(forecast))
+    })
+  // .then (
+  //   {getNewAPI}
+  //   )
+}
+
+
+  const getWeather = async(input)=>{
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${input}&appid=b9d30726a834b3a44eec4e5a08ad64bd`)
     .then((res)=>{
       return res.json()
@@ -20,29 +53,32 @@ function App() {
         console.log("not found")
         console.log(forecast.name +" notfound")
       }
-      else setWeather(forecast)
+      else {
+      addWeatherToApi(forecast)
+      console.log(forecast)
+      setWeather(forecast)
+      }
     }) 
     .catch ((err) => {
-      console.log(err.response.data);
-      this.setState({ error: err.response.data.message });
+      console.log(err);
     })
   }
 
 //happens on mount/pageload
 console.log(weather)
-
+const inputElement = useRef(null)
 const handleInput = event =>{
-  getWeather(event.target.value)
+  getWeather(inputElement.current.value)
 }
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>Weather-Project</h1>
-        <input 
+        <input ref = {inputElement}
           className='inputBox' 
-          onInput={handleInput} 
         ></input>
+          <button onClick={handleInput} >submit</button>
         {weather && <ApiDisplay weather = {weather}/>}
       </header>
     </div>
